@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Test d'Intégration Française</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C8A96E;
+    --gold-light: #E8C87A;
+    --bg: #08080E;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text: #F0EDE8;
+    --muted: #6B7D8E;
+    --green: #34D399;
+    --red: #F87171;
+    --blue: #60A5FA;
+    --fr-blue: #002395;
+    --fr-red: #ED2939;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+
+  /* BACKGROUND EFFECTS */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 50% at 15% 10%, rgba(42,14,82,0.55) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 90%, rgba(14,42,82,0.45) 0%, transparent 60%);
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 44px, rgba(255,255,255,0.013) 44px, rgba(255,255,255,0.013) 45px),
+      repeating-linear-gradient(90deg, transparent, transparent 44px, rgba(255,255,255,0.013) 44px, rgba(255,255,255,0.013) 45px);
+  }
+
+  .wrap { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 16px 60px; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes scaleIn { from { opacity:0; transform:scale(0.93); } to { opacity:1; transform:scale(1); } }
+  @keyframes shine {
+    from { background-position: -200% center; }
+    to { background-position: 200% center; }
+  }
+  @keyframes timerPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+  }
+  @keyframes correctFlash { 0%,100%{background:var(--surface)} 50%{background:rgba(52,211,153,0.12)} }
+  @keyframes wrongFlash { 0%,100%{background:var(--surface)} 50%{background:rgba(248,113,113,0.1)} }
+  @keyframes barFill { from{width:0} }
+  @keyframes countUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* SCREENS */
+  .screen { display:none; width:100%; max-width:620px; }
+  .screen.active { display:flex; flex-direction:column; }
+
+  /* ===== HOME SCREEN ===== */
+  #home { padding-top: 44px; animation: fadeUp 0.6s ease both; }
+
+  .tricolor {
+    display: flex; gap: 4px; justify-content: center; margin-bottom: 28px;
+  }
+  .tricolor span {
+    height: 5px; border-radius: 3px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .tricolor span:nth-child(1) { background: var(--fr-blue); width: 28px; animation-delay:0.1s; }
+  .tricolor span:nth-child(2) { background: #EDEDED; width: 28px; animation-delay:0.2s; }
+  .tricolor span:nth-child(3) { background: var(--fr-red); width: 28px; animation-delay:0.3s; }
+
+  .home-badge {
+    text-align:center; font-size:11px; letter-spacing:5px; color:var(--muted);
+    text-transform:uppercase; margin-bottom:14px;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+  .home-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(38px, 8vw, 60px);
+    font-weight: 700; text-align: center; line-height: 1.05;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #F0EDE8 0%, #C8A96E 40%, #E8C87A 60%, #F0EDE8 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shine 5s linear infinite, fadeUp 0.6s 0.25s ease both;
+  }
+  .home-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-style:italic; color:var(--muted);
+    text-align:center; margin-bottom:36px;
+    animation: fadeUp 0.5s 0.35s ease both;
+  }
+
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.5s 0.4s ease both;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 8px; text-align:center;
+    backdrop-filter: blur(12px);
+  }
+  .stat-icon { font-size:18px; margin-bottom:4px; }
+  .stat-n { font-size:20px; font-weight:700; color:var(--gold); font-family:'Cormorant Garamond',serif; }
+  .stat-l { font-size:10px; color:var(--muted); margin-top:2px; letter-spacing:0.5px; }
+
+  .info-box {
+    background: rgba(200,169,110,0.07);
+    border: 1px solid rgba(200,169,110,0.2);
+    border-radius: 16px; padding: 20px 22px; margin-bottom: 28px;
+    animation: fadeUp 0.5s 0.45s ease both;
+  }
+  .info-box h3 {
+    font-family:'DM Sans',sans-serif; font-size:12px; letter-spacing:2px;
+    color:var(--gold); text-transform:uppercase; margin-bottom:12px;
+  }
+  .info-list { list-style:none; display:flex; flex-direction:column; gap:7px; }
+  .info-list li { display:flex; gap:10px; align-items:flex-start; }
+  .info-list li::before { content:'›'; color:var(--gold); flex-shrink:0; margin-top:1px; }
+  .info-list li span { font-size:13px; color:var(--muted); line-height:1.5; }
+
+  .start-btn {
+    width:100%; padding:20px; border-radius:16px; border:none; cursor:pointer;
+    font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700;
+    letter-spacing:2px; text-transform:uppercase; color:#0A0A0F;
+    background: linear-gradient(135deg, #B8924A 0%, #E8C87A 45%, #C8A96E 100%);
+    box-shadow: 0 8px 40px rgba(200,169,110,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: all 0.2s;
+    animation: fadeUp 0.5s 0.5s ease both;
+  }
+  .start-btn:active { transform:scale(0.97); }
+  .start-btn:hover { transform:translateY(-2px); box-shadow:0 12px 50px rgba(200,169,110,0.45); }
+  .start-note {
+    text-align:center; font-size:11px; color:#2D3748; letter-spacing:1.5px;
+    margin-top:14px; text-transform:uppercase;
+    animation: fadeUp 0.5s 0.55s ease both;
+  }
+
+  /* ===== QUIZ SCREEN ===== */
+  #quiz { padding-top: 20px; animation: scaleIn 0.3s ease both; }
+
+  .quiz-header {
+    display:flex; align-items:center; gap:10px; margin-bottom:16px; width:100%;
+  }
+  .quit-btn {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; color:var(--muted); padding:8px 14px;
+    font-size:12px; cursor:pointer; white-space:nowrap; font-family:'DM Sans',sans-serif;
+    transition:all 0.15s;
+  }
+  .quit-btn:hover { color:var(--red); border-color:rgba(248,113,113,0.3); }
+
+  .progress-wrap { flex:1; }
+  .progress-bar-bg {
+    height:4px; background:rgba(255,255,255,0.07); border-radius:99px;
+    overflow:hidden; margin-bottom:5px;
+  }
+  .progress-bar-fill {
+    height:100%; border-radius:99px;
+    background:linear-gradient(90deg,var(--gold),var(--gold-light));
+    transition:width 0.5s ease;
+    animation: barFill 0.5s ease;
+  }
+  .progress-labels {
+    display:flex; justify-content:space-between; font-size:11px; color:var(--muted);
+  }
+  .progress-score { color:var(--gold); font-weight:600; }
+
+  .timer-box {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:8px 14px; text-align:center; min-width:76px;
+    transition:all 0.3s;
+  }
+  .timer-box.warning { background:rgba(251,191,36,0.1); border-color:rgba(251,191,36,0.35); }
+  .timer-box.danger { background:rgba(239,68,68,0.12); border-color:rgba(239,68,68,0.45); animation:timerPulse 1s infinite; }
+  .timer-num { font-size:18px; font-weight:700; font-family:monospace; color:var(--gold); }
+  .timer-box.warning .timer-num { color:#FBBF24; }
+  .timer-box.danger .timer-num { color:var(--red); }
+  .timer-label { font-size:9px; color:var(--muted); letter-spacing:1px; margin-top:2px; }
+
+  .cat-tag {
+    display:inline-block; font-size:10px; letter-spacing:2px; text-transform:uppercase;
+    padding:4px 12px; border-radius:99px;
+    background:rgba(255,255,255,0.05); color:var(--gold);
+    border:1px solid rgba(200,169,110,0.2);
+    margin-bottom:14px;
+  }
+  .cat-tag.situation { color:#FBBF24; border-color:rgba(251,191,36,0.25); background:rgba(251,191,36,0.06); }
+
+  .question-card {
+    background:rgba(255,255,255,0.035);
+    border:1px solid rgba(255,255,255,0.09);
+    border-radius:20px; padding:26px 22px; margin-bottom:18px;
+    backdrop-filter:blur(20px);
+  }
+  .question-text {
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(18px,4vw,23px); font-weight:600;
+    color:var(--text); line-height:1.5;
+  }
+
+  .options { display:flex; flex-direction:column; gap:10px; }
+  .option {
+    display:flex; align-items:center; gap:14px;
+    padding:14px 16px; border-radius:14px; cursor:pointer;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+    transition:all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    font-family:'DM Sans',sans-serif; font-size:14px; color:#C8BFA8;
+    text-align:left; width:100%;
+  }
+  .option:not(:disabled):hover { transform:translateX(6px); background:rgba(255,255,255,0.07); }
+  .option:disabled { cursor:default; }
+  .option.correct {
+    background:rgba(52,211,153,0.1); border:1.5px solid rgba(52,211,153,0.45);
+    color:#6EE7B7; animation:correctFlash 0.6s ease;
+  }
+  .option.wrong {
+    background:rgba(248,113,113,0.09); border:1.5px solid rgba(248,113,113,0.4);
+    color:#FCA5A5; animation:wrongFlash 0.4s ease;
+  }
+  .option.faded { background:rgba(255,255,255,0.02); color:#2D3748; border-color:rgba(255,255,255,0.04); }
+
+  .opt-label {
+    width:28px; height:28px; border-radius:8px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.08); color:var(--muted);
+    transition:all 0.18s;
+  }
+  .option.correct .opt-label { background:rgba(52,211,153,0.18); border-color:rgba(52,211,153,0.4); color:#34D399; }
+  .option.wrong .opt-label { background:rgba(248,113,113,0.18); border-color:rgba(248,113,113,0.35); color:var(--red); }
+
+  /* ===== TIMEOUT SCREEN ===== */
+  #timeout { padding-top:60px; text-align:center; animation:fadeUp 0.5s ease both; }
+  .timeout-icon { font-size:68px; margin-bottom:20px; }
+  .timeout-title {
+    font-family:'Cormorant Garamond',serif; font-size:44px; font-weight:700;
+    color:var(--red); margin-bottom:10px;
+  }
+  .timeout-sub { color:var(--muted); font-size:16px; line-height:1.6; margin-bottom:36px; }
+
+  /* ===== RESULT SCREEN ===== */
+  #result { padding-top:32px; animation:fadeUp 0.5s ease both; }
+
+  .score-circle {
+    width:160px; height:160px; border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    margin:0 auto 20px; transition:all 0.3s;
+  }
+  .score-circle.pass {
+    background:radial-gradient(circle,rgba(52,211,153,0.14) 0%,rgba(52,211,153,0.04) 100%);
+    border:3px solid rgba(52,211,153,0.4);
+    box-shadow:0 0 60px rgba(52,211,153,0.14);
+  }
+  .score-circle.fail {
+    background:radial-gradient(circle,rgba(248,113,113,0.14) 0%,rgba(248,113,113,0.04) 100%);
+    border:3px solid rgba(248,113,113,0.4);
+    box-shadow:0 0 60px rgba(248,113,113,0.14);
+  }
+  .score-pct {
+    font-family:'Cormorant Garamond',serif; font-size:48px; font-weight:700;
+    animation:countUp 0.5s 0.2s ease both;
+  }
+  .score-circle.pass .score-pct { color:var(--green); }
+  .score-circle.fail .score-pct { color:var(--red); }
+  .score-frac { font-size:12px; color:var(--muted); margin-top:2px; }
+
+  .result-verdict {
+    font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700;
+    text-align:center; margin-bottom:6px;
+  }
+  .result-sub { color:var(--muted); font-size:13px; text-align:center; font-style:italic; margin-bottom:28px; }
+
+  .result-grid {
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:26px;
+  }
+  .result-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:16px 10px; text-align:center;
+  }
+  .result-card-n { font-size:24px; font-weight:700; }
+  .result-card-l { font-size:11px; color:var(--muted); margin-top:3px; }
+
+  .errors-section { margin-bottom:26px; }
+  .errors-title {
+    font-size:10px; letter-spacing:3px; color:var(--muted);
+    text-transform:uppercase; margin-bottom:12px; font-family:'DM Sans',sans-serif;
+  }
+  .errors-list { display:flex; flex-direction:column; gap:10px; max-height:380px; overflow-y:auto; }
+  .errors-list::-webkit-scrollbar { width:3px; }
+  .errors-list::-webkit-scrollbar-track { background:transparent; }
+  .errors-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:99px; }
+
+  .error-card {
+    background:rgba(248,113,113,0.05); border-radius:14px;
+    padding:14px 16px; border:1px solid rgba(248,113,113,0.14);
+    border-left:3px solid var(--red);
+  }
+  .error-cat { font-size:11px; color:var(--muted); margin-bottom:5px; letter-spacing:0.5px; }
+  .error-q { font-size:13px; font-weight:600; color:#D1CAC0; margin-bottom:7px; line-height:1.4; }
+  .error-wrong { font-size:12px; color:#FCA5A5; margin-bottom:3px; }
+  .error-correct { font-size:12px; color:#6EE7B7; }
+
+  .btn-primary {
+    width:100%; padding:18px; border-radius:14px; border:none; cursor:pointer;
+    font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700;
+    letter-spacing:1.5px; text-transform:uppercase; color:#0A0A0F;
+    background:linear-gradient(135deg,#B8924A,#E8C87A,#C8A96E);
+    box-shadow:0 6px 30px rgba(200,169,110,0.3);
+    transition:all 0.2s; margin-bottom:10px;
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 40px rgba(200,169,110,0.4); }
+  .btn-primary:active { transform:scale(0.97); }
+
+  .btn-secondary {
+    width:100%; padding:15px; border-radius:14px; border:1px solid var(--border);
+    cursor:pointer; font-family:'DM Sans',sans-serif; font-size:14px;
+    color:var(--muted); background:var(--surface); transition:all 0.2s;
+  }
+  .btn-secondary:hover { color:var(--text); border-color:rgba(255,255,255,0.15); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HOME -->
+  <div id="home" class="screen active">
+    <div class="tricolor">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="home-badge">Préparation officielle</div>
+    <h1 class="home-title">Test d'Intégration<br>Française</h1>
+    <p class="home-sub">République Française</p>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-n">200</div><div class="stat-l">Questions</div></div>
+      <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-n">40</div><div class="stat-l">Par session</div></div>
+      <div class="stat-card"><div class="stat-icon">⏱</div><div class="stat-n">40</div><div class="stat-l">Minutes</div></div>
+      <div class="stat-card"><div class="stat-icon">💡</div><div class="stat-n">12</div><div class="stat-l">Situations</div></div>
+    </div>
+
+    <div class="info-box">
+      <h3>📋 Format du test</h3>
+      <ul class="info-list">
+        <li><span>40 questions tirées aléatoirement parmi 200</span></li>
+        <li><span>12 questions situationnelles comme dans le vrai test</span></li>
+        <li><span>Chronomètre 40 min — fermeture automatique</span></li>
+        <li><span>Questions différentes à chaque session</span></li>
+        <li><span>4 réponses proposées, une seule correcte</span></li>
+      </ul>
+    </div>
+
+    <button class="start-btn" onclick="startQuiz()">Commencer le test</button>
+    <p class="start-note">Les questions changent à chaque session</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="screen">
+    <div class="quiz-header">
+      <button class="quit-btn" onclick="finishEarly()">✕ Terminer</button>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+        </div>
+        <div class="progress-labels">
+          <span id="progressLabel">Question 1 / 40</span>
+          <span class="progress-score" id="scoreLabel">0 correctes</span>
+        </div>
+      </div>
+      <div class="timer-box" id="timerBox">
+        <div class="timer-num" id="timerNum">40:00</div>
+        <div class="timer-label">RESTANT</div>
+      </div>
+    </div>
+
+    <div class="cat-tag" id="catTag">Symboles</div>
+    <div class="question-card">
+      <p class="question-text" id="questionText">Chargement...</p>
+    </div>
+    <div class="options" id="optionsContainer"></div>
+  </div>
+
+  <!-- TIMEOUT -->
+  <div id="timeout" class="screen">
+    <div class="timeout-icon">⏰</div>
+    <div class="timeout-title">Temps écoulé</div>
+    <p class="timeout-sub">Votre temps de 40 minutes est écoulé.<br>Le test a été automatiquement soumis.</p>
+    <div class="result-grid" id="timeoutStats"></div>
+    <br>
+    <button class="btn-primary" onclick="startQuiz()">Nouveau test</button>
+    <button class="btn-secondary" onclick="showScreen('home')">← Accueil</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="screen">
+    <div class="score-circle" id="scoreCircle">
+      <div class="score-pct" id="scorePct">0%</div>
+      <div class="score-frac" id="scoreFrac">0/40</div>
+    </div>
+    <div class="result-verdict" id="resultVerdict"></div>
+    <div class="result-sub" id="resultSub"></div>
+
+    <div class="result-grid" id="resultGrid"></div>
+
+    <div class="errors-section" id="errorsSection" style="display:none">
+      <div class="errors-title">Erreurs à revoir</div>
+      <div class="errors-list" id="errorsList"></div>
+    </div>
+
+    <button class="btn-primary" onclick="startQuiz()">Nouveau test — nouvelles questions</button>
+    <button class="btn-secondary" onclick="showScreen('home')">← Accueil</button>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// QUESTIONS BASE (161 questions factuelles)
+// ============================================================
+const BASE = [
+  {cat:"Symboles",q:"À quoi correspond la date du 14 juillet ?",c:"À la prise de la Bastille (1789) et à la Fête de la Fédération (1790)",o:["À la prise de la Bastille (1789) et à la Fête de la Fédération (1790)","À la proclamation de la République en 1792","Au couronnement de Napoléon Bonaparte","À la signature de la Constitution de 1958"]},
+  {cat:"Symboles",q:"Quel est l'un des symboles de la République française ?",c:"Marianne",o:["Marianne","La tour Eiffel","Napoléon","La Joconde"]},
+  {cat:"Symboles",q:"« Liberté, égalité, fraternité », c'est :",c:"La devise de la République française",o:["La devise de la République française","Le nom de l'hymne national","Un article de la Constitution","Le nom d'une fête nationale"]},
+  {cat:"Symboles",q:"Quels sont les symboles officiels de la République française ?",c:"Le drapeau tricolore, Marianne, La Marseillaise et la devise",o:["Le drapeau tricolore, Marianne, La Marseillaise et la devise","La tour Eiffel, le Louvre, l'Arc de Triomphe","Le coq, le béret et la baguette","Le drapeau, l'hymne et le président"]},
+  {cat:"Symboles",q:"Quel est le nom de l'hymne national français ?",c:"La Marseillaise",o:["La Marseillaise","La Liberté","La Fille de France","La Victoire"]},
+  {cat:"Symboles",q:"Quelles sont les couleurs du drapeau français ?",c:"Bleu, blanc et rouge",o:["Bleu, blanc et rouge","Rouge, jaune et vert","Bleu, rouge et vert","Blanc, or et bleu"]},
+  {cat:"Symboles",q:"Quel animal est un symbole de la France ?",c:"Le coq gaulois",o:["Le coq gaulois","L'aigle","Le lion","Le renard"]},
+  {cat:"Symboles",q:"Qui est Marianne ?",c:"La figure symbolique de la République française",o:["La figure symbolique de la République française","Une chanteuse française célèbre","La femme de Napoléon","La déesse de la victoire"]},
+  {cat:"Symboles",q:"Qu'est-ce qui est organisé sur les Champs-Élysées le 14 juillet ?",c:"Un défilé militaire",o:["Un défilé militaire","Un concert de musique classique","Une foire populaire","Un marathon"]},
+  {cat:"Symboles",q:"Quelle est la devise de la République française ?",c:"Liberté, Égalité, Fraternité",o:["Liberté, Égalité, Fraternité","Un pour tous, tous pour un","Dieu, Honneur, Patrie","Force, Raison, Justice"]},
+  {cat:"Symboles",q:"Où peut-on voir la devise de la République ?",c:"Sur les bâtiments publics, les mairies et les écoles",o:["Sur les bâtiments publics, les mairies et les écoles","Uniquement dans les tribunaux","Sur les billets de banque seulement","Seulement à l'Assemblée nationale"]},
+  {cat:"Symboles",q:"Quel symbole de la République française est tricolore ?",c:"Le drapeau français",o:["Le drapeau français","L'emblème de Marianne","Le sceau de la République","La cocarde présidentielle"]},
+  {cat:"Symboles",q:"Lequel de ces symboles représente officiellement la République française ?",c:"Marianne",o:["Marianne","Napoléon Bonaparte","Charles de Gaulle","La tour Eiffel"]},
+  {cat:"Symboles",q:"Quelle est la date de la fête nationale française ?",c:"Le 14 juillet",o:["Le 14 juillet","Le 11 novembre","Le 8 mai","Le 1er mai"]},
+  {cat:"Valeurs",q:"Le principe d'égalité signifie que :",c:"Tous les citoyens sont égaux devant la loi, sans distinction d'origine, de sexe ou de religion",o:["Tous les citoyens sont égaux devant la loi, sans distinction d'origine, de sexe ou de religion","Tous les citoyens reçoivent le même salaire","Tous les citoyens ont la même éducation","Tous les citoyens paient les mêmes impôts"]},
+  {cat:"Valeurs",q:"Que signifie le mot « fraternité » dans la devise française ?",c:"La solidarité, le respect et l'entraide entre les citoyens",o:["La solidarité, le respect et l'entraide entre les citoyens","Une alliance militaire entre pays","L'unité religieuse des citoyens","L'obligation de servir dans l'armée"]},
+  {cat:"Valeurs",q:"Que signifie la liberté ?",c:"Chacun peut penser, s'exprimer et agir librement dans le respect de la loi",o:["Chacun peut penser, s'exprimer et agir librement dans le respect de la loi","On peut faire tout ce qu'on veut sans limite","Seuls les citoyens ont des droits","La liberté s'arrête aux frontières de la France"]},
+  {cat:"Valeurs",q:"Qu'est-ce que l'égalité ?",c:"Tous les citoyens ont les mêmes droits et les mêmes devoirs",o:["Tous les citoyens ont les mêmes droits et les mêmes devoirs","Tous les citoyens ont le même salaire","Tous les citoyens vivent au même endroit","Tous les citoyens partagent la même religion"]},
+  {cat:"Valeurs",q:"A-t-on le droit d'insulter publiquement quelqu'un parce qu'il est différent ?",c:"Non, c'est interdit par la loi",o:["Non, c'est interdit par la loi","Oui, si c'est une opinion personnelle","Oui, si c'est sur les réseaux sociaux","Oui, dans un espace privé"]},
+  {cat:"Valeurs",q:"Certains métiers peuvent-ils être réservés aux hommes ?",c:"Non, les métiers ne peuvent pas être réservés aux hommes",o:["Non, les métiers ne peuvent pas être réservés aux hommes","Oui, les métiers militaires","Oui, les travaux physiques lourds","Oui, les professions judiciaires"]},
+  {cat:"Valeurs",q:"Quelle liberté permet à chacun d'exprimer ses idées ?",c:"La liberté d'expression",o:["La liberté d'expression","La liberté de circulation","La liberté de conscience","La liberté d'association"]},
+  {cat:"Valeurs",q:"La liberté d'expression est garantie par la loi, mais :",c:"Elle a des limites fixées par la loi",o:["Elle a des limites fixées par la loi","Elle est absolue et sans limite","Elle s'applique uniquement aux Français","Elle est réservée aux médias"]},
+  {cat:"Valeurs",q:"Quel est l'un des rôles des associations ?",c:"Aider les personnes, défendre des intérêts ou organiser des activités",o:["Aider les personnes, défendre des intérêts ou organiser des activités","Remplacer le gouvernement","Faire les lois à la place du Parlement","Gérer les impôts des citoyens"]},
+  {cat:"Laïcité",q:"En quelle année la loi de séparation des Églises et de l'État a-t-elle été votée ?",c:"1905",o:["1905","1789","1958","1881"]},
+  {cat:"Laïcité",q:"Qu'est-ce que la laïcité ?",c:"Le principe de séparation des religions et de l'État, garantissant la neutralité des institutions publiques",o:["Le principe de séparation des religions et de l'État, garantissant la neutralité des institutions publiques","L'obligation pour tous les citoyens de pratiquer une seule religion","L'interdiction de toute pratique religieuse","Le droit de l'État de choisir une religion officielle"]},
+  {cat:"Laïcité",q:"Que permet le principe de laïcité ?",c:"Il garantit la liberté de conscience et la neutralité de l'État",o:["Il garantit la liberté de conscience et la neutralité de l'État","Il impose une religion d'État","Il interdit toute religion en France","Il oblige les citoyens à se déclarer athées"]},
+  {cat:"Laïcité",q:"Une personne peut-elle changer librement de religion ?",c:"Oui, une personne peut changer librement de religion",o:["Oui, une personne peut changer librement de religion","Non, la religion est définie à la naissance","Seulement avec l'autorisation des autorités","Seulement une fois dans sa vie"]},
+  {cat:"Laïcité",q:"Un enfant peut-il refuser d'aller à l'école pour une raison religieuse ?",c:"Non, l'école est obligatoire",o:["Non, l'école est obligatoire","Oui, si les parents sont d'accord","Oui, lors des fêtes religieuses","Seulement à l'école primaire"]},
+  {cat:"Laïcité",q:"Une personne a-t-elle le droit de ne pas croire en une religion ?",c:"Oui, une personne a le droit de ne pas croire en une religion",o:["Oui, une personne a le droit de ne pas croire en une religion","Non, le christianisme est obligatoire","Non, la loi oblige à avoir une religion","Seulement les étrangers peuvent ne pas avoir de religion"]},
+  {cat:"Laïcité",q:"Quelle liberté permet à une personne de ne pas avoir de religion ?",c:"La liberté de conscience",o:["La liberté de conscience","La liberté de culte","La liberté d'expression","La liberté d'association"]},
+  {cat:"Laïcité",q:"Complétez : « La France est une République indivisible, ..., démocratique et sociale »",c:"Laïque",o:["Laïque","Chrétienne","Neutre","Monarchique"]},
+  {cat:"Laïcité",q:"Pourquoi le principe de laïcité doit-il être respecté à l'école ?",c:"Pour garantir la neutralité, l'égalité et le respect de tous les élèves",o:["Pour garantir la neutralité, l'égalité et le respect de tous les élèves","Pour interdire toute discussion sur la religion","Pour imposer une religion aux élèves","Pour séparer les élèves selon leur religion"]},
+  {cat:"Laïcité",q:"Quel droit est garanti par la laïcité ?",c:"La liberté de conscience et la liberté de religion",o:["La liberté de conscience et la liberté de religion","Le droit de vote uniquement","La liberté de la presse uniquement","Le droit à l'éducation uniquement"]},
+  {cat:"Institutions",q:"De quand date la Constitution de la Ve République ?",c:"1958",o:["1958","1945","1789","1870"]},
+  {cat:"Institutions",q:"Le Parlement est composé de :",c:"L'Assemblée nationale et du Sénat",o:["L'Assemblée nationale et du Sénat","Le Président et du Premier ministre","Du Sénat et du Conseil constitutionnel","Des ministres et des députés"]},
+  {cat:"Institutions",q:"Qui nomme le Premier ministre ?",c:"Le Président de la République",o:["Le Président de la République","Le Parlement","Le Conseil constitutionnel","Les citoyens lors d'élections"]},
+  {cat:"Institutions",q:"Combien de députés composent l'Assemblée nationale ?",c:"577 députés",o:["577 députés","348 sénateurs","700 députés","450 députés"]},
+  {cat:"Institutions",q:"Pour combien de temps est élu le président de la République française ?",c:"Cinq ans",o:["Cinq ans","Sept ans","Quatre ans","Six ans"]},
+  {cat:"Institutions",q:"Pour combien de temps sont élus les sénateurs ?",c:"Six ans",o:["Six ans","Cinq ans","Quatre ans","Sept ans"]},
+  {cat:"Institutions",q:"Pour combien de temps sont élus les députés ?",c:"Cinq ans",o:["Cinq ans","Six ans","Quatre ans","Sept ans"]},
+  {cat:"Institutions",q:"À partir de quel âge a-t-on le droit de voter ?",c:"18 ans",o:["18 ans","16 ans","21 ans","20 ans"]},
+  {cat:"Institutions",q:"Qui est élu lors des élections présidentielles ?",c:"Le Président de la République",o:["Le Président de la République","Les députés","Les sénateurs","Les maires"]},
+  {cat:"Institutions",q:"Qui est élu lors des élections législatives ?",c:"Les députés",o:["Les députés","Le Président","Les sénateurs","Les préfets"]},
+  {cat:"Institutions",q:"Qui est élu lors des élections municipales ?",c:"Les conseillers municipaux",o:["Les conseillers municipaux","Le Président","Les sénateurs","Les préfets"]},
+  {cat:"Institutions",q:"Quels sont les trois pouvoirs dans la séparation des pouvoirs ?",c:"Le pouvoir exécutif, législatif et judiciaire",o:["Le pouvoir exécutif, législatif et judiciaire","Le pouvoir présidentiel, parlementaire et militaire","Le pouvoir central, régional et municipal","Le pouvoir étatique, public et privé"]},
+  {cat:"Institutions",q:"Qui possède le pouvoir législatif ?",c:"Le Parlement",o:["Le Parlement","Le Président","Le Gouvernement","Les tribunaux"]},
+  {cat:"Institutions",q:"Qui vote les lois ?",c:"Le Parlement",o:["Le Parlement","Le Président","Le Premier ministre","Les citoyens par référendum"]},
+  {cat:"Institutions",q:"Qui réside au palais de l'Élysée ?",c:"Le Président de la République",o:["Le Président de la République","Le Premier ministre","Le président du Sénat","Le président de l'Assemblée nationale"]},
+  {cat:"Institutions",q:"Qui dirige la commune ?",c:"Le maire",o:["Le maire","Le préfet","Le député","Le gouverneur"]},
+  {cat:"Institutions",q:"Qui représente l'État dans un département ?",c:"Le préfet",o:["Le préfet","Le maire","Le député","Le ministre"]},
+  {cat:"Institutions",q:"Combien y a-t-il de départements en France ?",c:"101 départements",o:["101 départements","96 départements","13 régions","500 communes"]},
+  {cat:"Institutions",q:"Que signifie « suffrage universel » ?",c:"Tous les citoyens majeurs ont le droit de vote",o:["Tous les citoyens majeurs ont le droit de vote","Seuls les citoyens instruits votent","Seuls les hommes votent","Seuls les citoyens aisés votent"]},
+  {cat:"Institutions",q:"Qui possède le pouvoir exécutif ?",c:"Le Président de la République et le Gouvernement",o:["Le Président de la République et le Gouvernement","Le Parlement seul","Les tribunaux","Les préfets"]},
+  {cat:"Institutions",q:"Quel est le régime politique de la France aujourd'hui ?",c:"Une République démocratique à régime semi-présidentiel",o:["Une République démocratique à régime semi-présidentiel","Une monarchie constitutionnelle","Une République parlementaire","Une République présidentielle"]},
+  {cat:"Institutions",q:"Quel est le rôle du Parlement ?",c:"Il vote les lois et contrôle le Gouvernement",o:["Il vote les lois et contrôle le Gouvernement","Il nomme le Président","Il dirige l'armée","Il représente la France à l'étranger"]},
+  {cat:"Institutions",q:"Quel est le rôle des députés ?",c:"Ils votent les lois et contrôlent l'action du gouvernement",o:["Ils votent les lois et contrôlent l'action du gouvernement","Ils nomment le Premier ministre","Ils dirigent les communes","Ils représentent l'État dans les départements"]},
+  {cat:"Institutions",q:"Est-ce que le président de la République a tous les pouvoirs ?",c:"Non, les pouvoirs sont séparés et encadrés par la Constitution",o:["Non, les pouvoirs sont séparés et encadrés par la Constitution","Oui, il a tous les pouvoirs","Oui, en temps de crise","Non, c'est le Premier ministre qui gouverne seul"]},
+  {cat:"Institutions",q:"Quand sont élus les sénateurs ?",c:"Tous les six ans, avec renouvellement par moitié tous les trois ans",o:["Tous les six ans, avec renouvellement par moitié tous les trois ans","Tous les cinq ans en même temps que le Président","Tous les quatre ans","Tous les sept ans"]},
+  {cat:"Institutions",q:"Concernant les partis politiques, quelle proposition est correcte ?",c:"Ils participent à l'expression du suffrage et à la vie démocratique",o:["Ils participent à l'expression du suffrage et à la vie démocratique","Ils ont le droit de voter les lois","Ils remplacent le gouvernement","Ils sont interdits en France"]},
+  {cat:"Institutions",q:"Quelle condition est nécessaire pour voter aux élections ?",c:"Être majeur, inscrit sur les listes électorales et avoir la nationalité française",o:["Être majeur, inscrit sur les listes électorales et avoir la nationalité française","Avoir un diplôme universitaire","Être né en France","Parler couramment le français"]},
+  {cat:"Justice",q:"A-t-on le droit de ne pas respecter une loi ?",c:"Non, tout le monde doit respecter la loi",o:["Non, tout le monde doit respecter la loi","Oui, si on n'est pas d'accord avec elle","Oui, pour des raisons religieuses","Oui, si on est étranger"]},
+  {cat:"Justice",q:"Qui doit respecter la loi ?",c:"Tous les citoyens et toutes les personnes vivant en France",o:["Tous les citoyens et toutes les personnes vivant en France","Seulement les citoyens français","Seulement les adultes","Seulement les fonctionnaires"]},
+  {cat:"Justice",q:"Quel est le rôle de l'autorité judiciaire ?",c:"Appliquer la loi et sanctionner les infractions",o:["Appliquer la loi et sanctionner les infractions","Voter les lois","Diriger le gouvernement","Représenter l'État"]},
+  {cat:"Justice",q:"L'autorité judiciaire est exercée par :",c:"Les juges et les tribunaux",o:["Les juges et les tribunaux","Le Président","Le Parlement","La police"]},
+  {cat:"Justice",q:"Que se passe-t-il si un ministre ne respecte pas la loi ?",c:"Il peut être jugé et sanctionné par la justice",o:["Il peut être jugé et sanctionné par la justice","Il est automatiquement renvoyé","Il bénéficie d'une immunité totale","Il peut être réélu malgré tout"]},
+  {cat:"Justice",q:"Quelle est l'infraction la plus grave ?",c:"Le crime",o:["Le crime","La contravention","Le délit","L'amende"]},
+  {cat:"Justice",q:"Que risque une personne qui ne respecte pas la loi ?",c:"Une sanction pénale (amende, prison ou autre peine)",o:["Une sanction pénale (amende, prison ou autre peine)","Un simple avertissement","Une expulsion automatique","Rien, si c'est la première fois"]},
+  {cat:"Justice",q:"En France, est-ce légal d'être marié à plusieurs personnes en même temps ?",c:"Non, la polygamie est interdite en France",o:["Non, la polygamie est interdite en France","Oui, pour des raisons religieuses","Oui, avec l'accord du tribunal","Seulement pour les étrangers"]},
+  {cat:"Justice",q:"La peine de mort est :",c:"Abolie en France",o:["Abolie en France","Appliquée pour les crimes graves","Autorisée en temps de guerre","Décidée par le Président"]},
+  {cat:"Justice",q:"Qu'est-ce qu'une infraction ?",c:"Une violation de la loi",o:["Une violation de la loi","Une plainte administrative","Une action civile","Une amende routière"]},
+  {cat:"Justice",q:"Qui sanctionne l'auteur d'un vol ?",c:"Un juge",o:["Un juge","Le maire","La police seule","Le préfet"]},
+  {cat:"Justice",q:"Quel est le rôle de la police ?",c:"Assurer la sécurité des personnes et faire respecter la loi en zone urbaine",o:["Assurer la sécurité des personnes et faire respecter la loi en zone urbaine","Voter les lois","Juger les criminels","Représenter l'État dans les communes"]},
+  {cat:"Justice",q:"Quel est le rôle de la gendarmerie ?",c:"Assurer la sécurité publique et faire respecter la loi, notamment en zone rurale",o:["Assurer la sécurité publique et faire respecter la loi, notamment en zone rurale","Voter les lois","Juger les criminels","Représenter l'État dans les départements"]},
+  {cat:"Justice",q:"Que doit faire une victime de violences ?",c:"Porter plainte et demander de l'aide aux autorités",o:["Porter plainte et demander de l'aide aux autorités","Régler l'affaire à l'amiable uniquement","Ne rien faire","Quitter le pays"]},
+  {cat:"Europe",q:"Combien d'États font partie de l'Union européenne au 1er janvier 2025 ?",c:"27 États membres",o:["27 États membres","25 États membres","30 États membres","15 États membres"]},
+  {cat:"Europe",q:"Quel pays est un pays fondateur de l'Union européenne ?",c:"La France",o:["La France","Le Royaume-Uni","La Pologne","La Suède"]},
+  {cat:"Europe",q:"Quelle est la monnaie utilisée en France ?",c:"L'euro",o:["L'euro","Le franc français","Le dollar","La livre sterling"]},
+  {cat:"Europe",q:"À quelle fréquence les élections européennes sont-elles organisées ?",c:"Tous les cinq ans",o:["Tous les cinq ans","Tous les quatre ans","Tous les trois ans","Tous les sept ans"]},
+  {cat:"Europe",q:"Quand célèbre-t-on la journée de l'Europe ?",c:"Le 9 mai",o:["Le 9 mai","Le 1er janvier","Le 14 juillet","Le 25 mars"]},
+  {cat:"Europe",q:"En quelle année a été créée la Communauté Économique Européenne ?",c:"1957",o:["1957","1945","1992","1968"]},
+  {cat:"Europe",q:"Quel État n'est pas membre de l'Union européenne ?",c:"La Suisse",o:["La Suisse","L'Allemagne","L'Italie","L'Espagne"]},
+  {cat:"Europe",q:"Qui élit les députés européens ?",c:"Les citoyens au suffrage universel direct",o:["Les citoyens au suffrage universel direct","Les gouvernements des États membres","Le Parlement national","Le Conseil de l'Europe"]},
+  {cat:"Europe",q:"Quelle condition est nécessaire pour voter aux élections européennes ?",c:"Être majeur, citoyen d'un État membre de l'UE et inscrit sur les listes électorales",o:["Être majeur, citoyen d'un État membre de l'UE et inscrit sur les listes électorales","Être citoyen français uniquement","Parler plusieurs langues européennes","Avoir vécu dans plusieurs pays de l'UE"]},
+  {cat:"Histoire",q:"En quelle année a débuté la Révolution française ?",c:"1789",o:["1789","1776","1804","1815"]},
+  {cat:"Histoire",q:"Qui était Napoléon Ier ?",c:"Un empereur français",o:["Un empereur français","Un roi de France","Un Président de la République","Un général de la Révolution"]},
+  {cat:"Histoire",q:"En quelle année l'esclavage a-t-il été aboli définitivement en France ?",c:"1848",o:["1848","1789","1905","1944"]},
+  {cat:"Histoire",q:"Qui a rendu l'école gratuite, laïque et obligatoire ?",c:"Jules Ferry",o:["Jules Ferry","Napoléon Bonaparte","Charles de Gaulle","Louis XVI"]},
+  {cat:"Histoire",q:"Quand a eu lieu la Première Guerre mondiale ?",c:"De 1914 à 1918",o:["De 1914 à 1918","De 1939 à 1945","De 1870 à 1871","De 1900 à 1904"]},
+  {cat:"Histoire",q:"Quand a eu lieu la Seconde Guerre mondiale ?",c:"De 1939 à 1945",o:["De 1939 à 1945","De 1914 à 1918","De 1936 à 1942","De 1941 à 1946"]},
+  {cat:"Histoire",q:"Qu'est-ce que la Shoah ?",c:"L'extermination des Juifs d'Europe par le régime nazi pendant la Seconde Guerre mondiale",o:["L'extermination des Juifs d'Europe par le régime nazi pendant la Seconde Guerre mondiale","La Première Guerre mondiale","La Révolution française","L'occupation nazie de la France"]},
+  {cat:"Histoire",q:"Qui a été le premier Président de la Ve République ?",c:"Charles de Gaulle",o:["Charles de Gaulle","Georges Pompidou","Valéry Giscard d'Estaing","Napoléon III"]},
+  {cat:"Histoire",q:"À quoi correspond le 11 novembre ?",c:"L'armistice de 1918 — la fin de la Première Guerre mondiale",o:["L'armistice de 1918 — la fin de la Première Guerre mondiale","La Victoire en 1945","La prise de la Bastille","La proclamation de la République"]},
+  {cat:"Histoire",q:"Qui était le roi de France au moment de la Révolution française ?",c:"Louis XVI",o:["Louis XVI","Louis XIV","Louis XVIII","Charles X"]},
+  {cat:"Histoire",q:"Depuis quelle année l'école publique est-elle gratuite ?",c:"Depuis 1881",o:["Depuis 1881","Depuis 1905","Depuis 1789","Depuis 1958"]},
+  {cat:"Histoire",q:"De quelle année date la Déclaration des droits de l'homme et du citoyen ?",c:"1789",o:["1789","1958","1905","1848"]},
+  {cat:"Histoire",q:"Combien y a-t-il eu de républiques en France ?",c:"Cinq",o:["Cinq","Trois","Quatre","Six"]},
+  {cat:"Histoire",q:"Qui a fondé la Ve République ?",c:"Charles de Gaulle",o:["Charles de Gaulle","Georges Pompidou","François Mitterrand","Napoléon III"]},
+  {cat:"Histoire",q:"Pourquoi l'année 1958 est-elle importante pour la France ?",c:"La Constitution de la Ve République a été adoptée",o:["La Constitution de la Ve République a été adoptée","La fin de la Seconde Guerre mondiale","L'abolition de l'esclavage","La loi de séparation de l'Église et de l'État"]},
+  {cat:"Histoire",q:"Quel pays a été colonisé par la France ?",c:"L'Algérie",o:["L'Algérie","Le Brésil","L'Inde","La Chine"]},
+  {cat:"Géographie",q:"Quelle est la capitale de la France ?",c:"Paris",o:["Paris","Lyon","Marseille","Bordeaux"]},
+  {cat:"Géographie",q:"Sur quel continent se situe la France métropolitaine ?",c:"En Europe",o:["En Europe","En Afrique","En Asie","En Amérique"]},
+  {cat:"Géographie",q:"Combien y a-t-il de régions en France métropolitaine ?",c:"13 régions",o:["13 régions","22 régions","8 régions","101 régions"]},
+  {cat:"Géographie",q:"Quelle est la mer au sud de la France métropolitaine ?",c:"La mer Méditerranée",o:["La mer Méditerranée","La mer du Nord","La mer Baltique","La mer Noire"]},
+  {cat:"Géographie",q:"Quel océan borde la côte ouest française ?",c:"L'océan Atlantique",o:["L'océan Atlantique","L'océan Pacifique","L'océan Indien","L'océan Arctique"]},
+  {cat:"Géographie",q:"Quelle chaîne de montagnes est située entre la France et l'Italie ?",c:"Les Alpes",o:["Les Alpes","Les Pyrénées","Les Vosges","Le Jura"]},
+  {cat:"Géographie",q:"Où se situe la Corse ?",c:"En mer Méditerranée, au sud-est de la France",o:["En mer Méditerranée, au sud-est de la France","Dans l'océan Atlantique","Dans la Manche","Au large de la Bretagne"]},
+  {cat:"Géographie",q:"Quelle île est un département d'outre-mer français ?",c:"La Guadeloupe",o:["La Guadeloupe","Cuba","Haïti","La Jamaïque"]},
+  {cat:"Géographie",q:"Quelle ville est un grand port maritime en France ?",c:"Marseille",o:["Marseille","Lyon","Strasbourg","Toulouse"]},
+  {cat:"Géographie",q:"Quelle ville est située au bord de la mer Méditerranée ?",c:"Nice",o:["Nice","Bordeaux","Rennes","Strasbourg"]},
+  {cat:"Géographie",q:"Quel fleuve coule en France ?",c:"La Loire",o:["La Loire","Le Rhin","Le Danube","La Tamise"]},
+  {cat:"Géographie",q:"Quelle chaîne de montagnes sépare la France et l'Espagne ?",c:"Les Pyrénées",o:["Les Pyrénées","Les Alpes","Les Vosges","Le Massif central"]},
+  {cat:"Culture",q:"Qui était Molière ?",c:"Un écrivain et dramaturge français",o:["Un écrivain et dramaturge français","Un peintre français","Un homme politique français","Un philosophe français"]},
+  {cat:"Culture",q:"Qui était Simone de Beauvoir ?",c:"Une philosophe et écrivaine française",o:["Une philosophe et écrivaine française","Une chanteuse française","Une femme politique française","Une peintre française"]},
+  {cat:"Culture",q:"Qui était Albert Camus ?",c:"Un écrivain et philosophe français",o:["Un écrivain et philosophe français","Un peintre français","Un président français","Un chanteur français"]},
+  {cat:"Culture",q:"Qu'est-ce que le Louvre ?",c:"Un grand musée situé à Paris",o:["Un grand musée situé à Paris","Le palais du Président","Le Parlement de France","La cathédrale Notre-Dame"]},
+  {cat:"Culture",q:"Qui était Édith Piaf ?",c:"Une chanteuse française célèbre",o:["Une chanteuse française célèbre","Une philosophe française","Une femme politique","Une peintre impressionniste"]},
+  {cat:"Culture",q:"Qui était Victor Hugo ?",c:"Un écrivain français",o:["Un écrivain français","Un philosophe allemand","Un peintre italien","Un poète espagnol"]},
+  {cat:"Culture",q:"Dans quelle ville se trouve la tour Eiffel ?",c:"À Paris",o:["À Paris","À Lyon","À Nice","À Strasbourg"]},
+  {cat:"Culture",q:"Qui était Paul Cézanne ?",c:"Un peintre français",o:["Un peintre français","Un sculpteur","Un écrivain","Un musicien"]},
+  {cat:"Culture",q:"Qui était Joséphine Baker ?",c:"Une artiste et résistante française",o:["Une artiste et résistante française","Une femme politique","Une philosophe","Une écrivaine"]},
+  {cat:"Culture",q:"Qui était Jean de La Fontaine ?",c:"Un écrivain français, auteur de fables",o:["Un écrivain français, auteur de fables","Un peintre impressionniste","Un philosophe des Lumières","Un général napoléonien"]},
+  {cat:"Culture",q:"Qui était Charles Baudelaire ?",c:"Un poète français",o:["Un poète français","Un peintre français","Un philosophe français","Un musicien français"]},
+  {cat:"Culture",q:"Qui était George Sand ?",c:"Une écrivaine française",o:["Une écrivaine française","Une peintre française","Une chanteuse française","Une philosophe française"]},
+  {cat:"Vie quotidienne",q:"Quel numéro d'urgence permet d'appeler le SAMU ?",c:"Le 15",o:["Le 15","Le 17","Le 18","Le 112"]},
+  {cat:"Vie quotidienne",q:"Quel numéro d'urgence permet d'appeler les pompiers ?",c:"Le 18",o:["Le 18","Le 15","Le 17","Le 112"]},
+  {cat:"Vie quotidienne",q:"À quoi sert la carte Vitale ?",c:"Elle permet le remboursement des frais de santé",o:["Elle permet le remboursement des frais de santé","C'est une pièce d'identité","Elle donne accès aux services publics","Elle permet de payer les impôts"]},
+  {cat:"Vie quotidienne",q:"Qu'est-ce que le SMIC ?",c:"Le salaire minimum légal en France",o:["Le salaire minimum légal en France","Un système d'assurance sociale","La retraite maximale","Une allocation chômage"]},
+  {cat:"Vie quotidienne",q:"Quelle est la durée légale du temps de travail par semaine ?",c:"35 heures par semaine",o:["35 heures par semaine","40 heures par semaine","30 heures par semaine","45 heures par semaine"]},
+  {cat:"Vie quotidienne",q:"À partir de quel âge un mineur peut-il travailler ?",c:"À partir de 16 ans (avec certaines exceptions)",o:["À partir de 16 ans (avec certaines exceptions)","À partir de 14 ans","À partir de 18 ans","À partir de 15 ans"]},
+  {cat:"Vie quotidienne",q:"Jusqu'à quel âge l'école est-elle obligatoire ?",c:"Jusqu'à 16 ans",o:["Jusqu'à 16 ans","Jusqu'à 14 ans","Jusqu'à 18 ans","Jusqu'à 15 ans"]},
+  {cat:"Vie quotidienne",q:"Quel diplôme obtient-on à la fin du lycée ?",c:"Le baccalauréat",o:["Le baccalauréat","La licence","Le master","Le brevet"]},
+  {cat:"Vie quotidienne",q:"Pour qui l'école est-elle obligatoire ?",c:"Pour tous les enfants résidant en France, de 3 à 16 ans",o:["Pour tous les enfants résidant en France, de 3 à 16 ans","Seulement pour les enfants français","Pour les enfants de 6 à 18 ans","Seulement en primaire"]},
+  {cat:"Vie quotidienne",q:"Quand faut-il déclarer un enfant à la mairie après sa naissance ?",c:"Dans les cinq jours suivant la naissance",o:["Dans les cinq jours suivant la naissance","Dans un mois","Dans une semaine","Dans les trois jours"]},
+  {cat:"Vie quotidienne",q:"Le travail non déclaré est :",c:"Illégal",o:["Illégal","Légal si c'est entre amis","Légal en dehors des heures de travail","Légal pour les petits montants"]},
+  {cat:"Vie quotidienne",q:"Jeter une bouteille dans la rue est :",c:"Interdit et passible d'une amende",o:["Interdit et passible d'une amende","Autorisé si c'est en verre","Autorisé la nuit","Autorisé en dehors des villes"]},
+  {cat:"Vie quotidienne",q:"Que permet la citoyenneté française ?",c:"Voter, être élu et participer à la vie démocratique",o:["Voter, être élu et participer à la vie démocratique","Travailler sans restrictions uniquement","Voyager librement en Europe uniquement","Ne pas payer d'impôts"]},
+  {cat:"Vie quotidienne",q:"Quel est le rôle du médecin traitant ?",c:"Il suit le patient et l'oriente vers des spécialistes si nécessaire",o:["Il suit le patient et l'oriente vers des spécialistes si nécessaire","Il effectue uniquement les opérations chirurgicales","Il gère les urgences hospitalières","Il délivre les médicaments"]},
+  {cat:"Vie quotidienne",q:"À quoi sert une mutuelle santé ?",c:"Elle complète le remboursement de l'Assurance Maladie",o:["Elle complète le remboursement de l'Assurance Maladie","Elle remplace l'Assurance Maladie","Elle finance les médicaments uniquement","Elle couvre uniquement les hospitalisations"]},
+  {cat:"Vie quotidienne",q:"Quelle est la première démarche pour chercher un emploi ?",c:"S'inscrire auprès de France Travail",o:["S'inscrire auprès de France Travail","Contacter directement les entreprises","Passer un concours","Déposer son CV à la mairie"]},
+  {cat:"Vie quotidienne",q:"À quelles conditions un mariage est-il reconnu juridiquement en France ?",c:"S'il est célébré à la mairie par un officier d'état civil",o:["S'il est célébré à la mairie par un officier d'état civil","S'il est célébré à l'église uniquement","S'il est déclaré devant témoins","S'il est enregistré dans un consulat"]},
+  {cat:"Vie quotidienne",q:"Est-il toujours possible de divorcer en France ?",c:"Oui, le divorce est autorisé en France",o:["Oui, le divorce est autorisé en France","Non, le divorce est interdit","Oui, seulement après 10 ans de mariage","Oui, uniquement pour faute grave"]},
+  {cat:"Vie quotidienne",q:"Une femme peut-elle créer son entreprise ?",c:"Oui, une femme peut créer son entreprise",o:["Oui, une femme peut créer son entreprise","Non, seulement les hommes peuvent le faire","Oui, mais seulement dans certains secteurs","Oui, avec l'autorisation de son mari"]},
+  {cat:"Vie quotidienne",q:"Faut-il réduire ses déchets ?",c:"Oui, pour protéger l'environnement",o:["Oui, pour protéger l'environnement","Non, c'est la responsabilité de l'État","Seulement dans les grandes villes","Ce n'est pas obligatoire"]},
+  {cat:"Vie quotidienne",q:"Quel est l'objectif des vaccinations obligatoires ?",c:"Protéger la santé individuelle et collective",o:["Protéger la santé individuelle et collective","Contrôler la population","Générer des bénéfices pour l'État","Remplacer les médicaments"]},
+  {cat:"Vie quotidienne",q:"Quelle est la langue officielle de la République française ?",c:"Le français",o:["Le français","Le français et l'anglais","Le français et l'allemand","Toutes les langues régionales"]},
+  {cat:"Vie quotidienne",q:"Une personne étrangère en situation régulière peut-elle créer son entreprise ?",c:"Oui, si elle respecte les conditions légales",o:["Oui, si elle respecte les conditions légales","Non, c'est réservé aux Français","Non, il faut la nationalité française","Oui, mais uniquement dans le commerce"]},
+  {cat:"Vie quotidienne",q:"Quel texte a été adopté pendant la Révolution française ?",c:"La Déclaration des droits de l'homme et du citoyen",o:["La Déclaration des droits de l'homme et du citoyen","La Constitution de 1958","La loi de séparation de l'Église et de l'État","Le Code civil"]},
+  {cat:"Vie quotidienne",q:"Les libertés individuelles peuvent-elles être limitées ?",c:"Oui, pour protéger l'ordre public et les droits des autres",o:["Oui, pour protéger l'ordre public et les droits des autres","Non, les libertés sont absolues","Oui, mais seulement en temps de guerre","Non, la Constitution l'interdit"]},
+  {cat:"Vie quotidienne",q:"Une femme peut-elle avorter en France ?",c:"Oui, l'avortement est autorisé par la loi dans les conditions prévues",o:["Oui, l'avortement est autorisé par la loi dans les conditions prévues","Non, c'est interdit","Oui, mais seulement dans les 6 premières semaines","Seulement en cas de danger de mort"]},
+  {cat:"Vie quotidienne",q:"Que doit faire une personne en cas d'accident ?",c:"Porter assistance et prévenir les secours",o:["Porter assistance et prévenir les secours","Partir rapidement","Attendre que quelqu'un d'autre intervienne","Appeler son avocat en premier"]},
+  {cat:"Vie quotidienne",q:"Après avoir obtenu le permis de conduire, que faut-il faire pour pouvoir conduire ?",c:"Assurer son véhicule et l'immatriculer",o:["Assurer son véhicule et l'immatriculer","Payer une taxe à la mairie","Déclarer son véhicule à la police","Rien d'autre n'est nécessaire"]},
+];
+
+// ============================================================
+// QUESTIONS SITUATIONNELLES (39)
+// ============================================================
+const SITU = [
+  {cat:"Situation",q:"Votre voisin joue de la musique très fort à 2h du matin. Que faites-vous en premier ?",c:"Vous lui parlez calmement ou contactez le gardien de l'immeuble",o:["Vous lui parlez calmement ou contactez le gardien de l'immeuble","Vous cassez sa chaîne hi-fi","Vous l'insultez par la fenêtre","Vous ne faites rien et supportez"]},
+  {cat:"Situation",q:"Vous trouvez un portefeuille avec de l'argent dans la rue. Que devez-vous faire ?",c:"Le remettre au commissariat ou à la mairie",o:["Le remettre au commissariat ou à la mairie","Garder l'argent et jeter le portefeuille","Le garder pour vous","L'abandonner sur place"]},
+  {cat:"Situation",q:"Votre enfant de 7 ans refuse d'aller à l'école. Que devez-vous faire ?",c:"L'amener à l'école, car la scolarité est obligatoire de 3 à 16 ans",o:["L'amener à l'école, car la scolarité est obligatoire de 3 à 16 ans","Respecter son choix et le laisser à la maison","L'inscrire à une école privée uniquement","Attendre qu'il veuille y aller de lui-même"]},
+  {cat:"Situation",q:"Votre employeur vous propose de travailler sans vous déclarer. Que faites-vous ?",c:"Vous refusez, car le travail non déclaré est illégal",o:["Vous refusez, car le travail non déclaré est illégal","Vous acceptez, c'est une bonne affaire","Vous acceptez si le salaire est bon","Vous demandez l'avis de vos amis d'abord"]},
+  {cat:"Situation",q:"Vous êtes témoin d'une agression dans la rue. Que devez-vous faire ?",c:"Appeler le 17 (police) ou le 15 (SAMU) et porter assistance si possible",o:["Appeler le 17 (police) ou le 15 (SAMU) et porter assistance si possible","Ignorer la scène et partir","Prendre des photos et les poster sur les réseaux","Intervenir physiquement seul"]},
+  {cat:"Situation",q:"Un médecin vous prescrit un médicament. Que faites-vous pour être remboursé ?",c:"Vous présentez votre carte Vitale à la pharmacie",o:["Vous présentez votre carte Vitale à la pharmacie","Vous payez et ne demandez pas de remboursement","Vous allez directement à l'hôpital","Vous appelez le 15"]},
+  {cat:"Situation",q:"Votre enfant vient de naître. Que devez-vous faire dans les 5 premiers jours ?",c:"Déclarer la naissance à la mairie",o:["Déclarer la naissance à la mairie","Envoyer une lettre à la préfecture","Attendre un mois avant toute démarche","Rien, c'est automatique"]},
+  {cat:"Situation",q:"Vous venez de perdre votre emploi. Quelle est votre première démarche ?",c:"Vous inscrire auprès de France Travail",o:["Vous inscrire auprès de France Travail","Demander l'aide à votre famille uniquement","Attendre que l'employeur vous rappelle","Déménager dans une autre ville"]},
+  {cat:"Situation",q:"Votre propriétaire refuse de vous rendre votre caution sans raison valable. Que pouvez-vous faire ?",c:"Saisir la commission de conciliation ou le tribunal compétent",o:["Saisir la commission de conciliation ou le tribunal compétent","Rien, le propriétaire a tous les droits","Revenir occuper le logement de force","Menacer votre propriétaire"]},
+  {cat:"Situation",q:"Votre enfant est malade et ne peut pas aller à l'école. Que devez-vous faire ?",c:"Prévenir l'école et fournir un certificat médical si nécessaire",o:["Prévenir l'école et fournir un certificat médical si nécessaire","Ne rien faire, l'école s'en rendra compte","Envoyer un ami à la place","Attendre que l'enfant guérisse sans prévenir"]},
+  {cat:"Situation",q:"Vous êtes victime de discrimination au travail à cause de votre origine. Que pouvez-vous faire ?",c:"Saisir le Défenseur des droits ou saisir la justice",o:["Saisir le Défenseur des droits ou saisir la justice","Accepter la situation","Quitter immédiatement votre emploi","Organiser une manifestation"]},
+  {cat:"Situation",q:"Votre fils de 16 ans veut se marier. Est-ce possible en France ?",c:"Non, il faut avoir 18 ans pour se marier en France",o:["Non, il faut avoir 18 ans pour se marier en France","Oui, avec l'accord des parents","Oui, si les deux partenaires sont d'accord","Oui, avec l'autorisation du maire"]},
+  {cat:"Situation",q:"Vous recevez une convocation pour jury d'assises. Que devez-vous faire ?",c:"Vous présenter, sauf excuse légitime reconnue par la loi",o:["Vous présenter, sauf excuse légitime reconnue par la loi","Ignorer la convocation","Envoyer quelqu'un d'autre à votre place","Payer une amende pour éviter d'y aller"]},
+  {cat:"Situation",q:"Votre voisin jette ses ordures devant votre immeuble. Que pouvez-vous faire ?",c:"Signaler le problème à la mairie ou à la police municipale",o:["Signaler le problème à la mairie ou à la police municipale","Jeter vos ordures chez lui en représailles","Rien, c'est normal","L'inscrire dans une liste noire"]},
+  {cat:"Situation",q:"Vous voulez voter aux élections. Que faut-il faire au préalable ?",c:"S'inscrire sur les listes électorales et avoir 18 ans",o:["S'inscrire sur les listes électorales et avoir 18 ans","Rien, le vote est automatique","Payer une taxe électorale","Présenter un diplôme universitaire"]},
+  {cat:"Situation",q:"Vous avez un accident de voiture. La première chose à faire est :",c:"Sécuriser les lieux, appeler le 15 ou le 18 et rédiger un constat",o:["Sécuriser les lieux, appeler le 15 ou le 18 et rédiger un constat","Partir rapidement avant l'arrivée de la police","Ne rien déclarer à votre assurance","Attaquer l'autre conducteur"]},
+  {cat:"Situation",q:"Un inconnu vous propose un travail très bien payé sans contrat écrit. Que faites-vous ?",c:"Vous méfiez et demandez un contrat de travail écrit",o:["Vous méfiez et demandez un contrat de travail écrit","Acceptez immédiatement, c'est une chance","Signalez cela aux autorités directement","Acceptez si le salaire est supérieur au SMIC"]},
+  {cat:"Situation",q:"Votre enfant subit du harcèlement à l'école. Que faites-vous ?",c:"Contacter l'équipe pédagogique, puis les autorités si nécessaire",o:["Contacter l'équipe pédagogique, puis les autorités si nécessaire","Demander à votre enfant de se défendre seul","Changer d'école sans rien signaler","Régler le problème directement avec les parents de l'agresseur"]},
+  {cat:"Situation",q:"Vous souhaitez voter mais vous avez oublié votre carte d'électeur. Que faites-vous ?",c:"Vous pouvez voter avec une pièce d'identité valide uniquement",o:["Vous pouvez voter avec une pièce d'identité valide uniquement","Vous ne pouvez pas voter","Vous votez sans aucun document","Vous votez si un autre électeur vous identifie"]},
+  {cat:"Situation",q:"Votre employeur ne vous paie pas le SMIC. Que pouvez-vous faire ?",c:"Saisir l'inspection du travail ou le conseil des prud'hommes",o:["Saisir l'inspection du travail ou le conseil des prud'hommes","Accepter, car l'employeur décide du salaire","Quitter immédiatement sans recours","Faire une grève illimitée"]},
+  {cat:"Situation",q:"Un ami vous demande de signer un document officiel à sa place. Que faites-vous ?",c:"Vous refusez, c'est un faux en écriture qui est un délit",o:["Vous refusez, c'est un faux en écriture qui est un délit","Vous acceptez pour lui rendre service","Vous acceptez s'il vous paie","Vous demandez l'avis d'un notaire"]},
+  {cat:"Situation",q:"Votre carte de séjour expire dans 2 mois. Que devez-vous faire ?",c:"Faire la demande de renouvellement avant l'expiration auprès de la préfecture",o:["Faire la demande de renouvellement avant l'expiration auprès de la préfecture","Attendre l'expiration avant de demander le renouvellement","Ignorer, ce n'est pas grave","Partir à l'étranger et revenir avec un nouveau visa"]},
+  {cat:"Situation",q:"Un commerçant refuse de vous vendre un produit à cause de votre origine. Que pouvez-vous faire ?",c:"Porter plainte pour discrimination et saisir le Défenseur des droits",o:["Porter plainte pour discrimination et saisir le Défenseur des droits","Accepter la situation","Vandaliser sa boutique","En parler seulement à votre famille"]},
+  {cat:"Situation",q:"Vous êtes convoqué par votre employeur pour un entretien de licenciement. Que pouvez-vous faire ?",c:"Vous y rendre et vous faire assister par un représentant du personnel",o:["Vous y rendre et vous faire assister par un représentant du personnel","Ignorer la convocation","Refuser catégoriquement","Contacter immédiatement la police"]},
+  {cat:"Situation",q:"Votre enfant ne parle pas français en arrivant à l'école. Quels sont ses droits ?",c:"Il a le droit d'être scolarisé et peut bénéficier d'un soutien pour apprendre le français",o:["Il a le droit d'être scolarisé et peut bénéficier d'un soutien pour apprendre le français","Il ne peut pas aller à l'école avant d'apprendre le français","Il doit aller dans une école spéciale","Il n'a aucun droit scolaire"]},
+  {cat:"Situation",q:"Un policier vous contrôle et vous demande vos papiers. Que faites-vous ?",c:"Vous présentez calmement votre pièce d'identité ou votre titre de séjour",o:["Vous présentez calmement votre pièce d'identité ou votre titre de séjour","Vous refusez et partez","Vous insultez le policier","Vous appelez votre avocat immédiatement"]},
+  {cat:"Situation",q:"Vous souhaitez créer une association. Que devez-vous faire ?",c:"Déclarer l'association en préfecture selon la loi de 1901",o:["Déclarer l'association en préfecture selon la loi de 1901","Demander l'autorisation du maire","Demander l'autorisation du président","Rien, c'est automatique"]},
+  {cat:"Situation",q:"Vous avez été témoin d'un accident. Que faites-vous ?",c:"Appeler le 15 ou le 18, sécuriser les lieux et rester auprès des victimes",o:["Appeler le 15 ou le 18, sécuriser les lieux et rester auprès des victimes","Partir, ce n'est pas votre problème","Prendre des photos pour les réseaux sociaux","Attendre que quelqu'un d'autre intervienne"]},
+  {cat:"Situation",q:"Un inconnu vous propose d'acheter des médicaments sans ordonnance à prix réduit. Que faites-vous ?",c:"Vous refusez, c'est illégal et dangereux pour la santé",o:["Vous refusez, c'est illégal et dangereux pour la santé","Vous achetez, c'est moins cher","Vous lui demandez d'abord de voir les médicaments","Vous acceptez si vous connaissez le médicament"]},
+  {cat:"Situation",q:"Vous êtes en désaccord avec une décision administrative (refus de titre de séjour...). Que pouvez-vous faire ?",c:"Former un recours auprès de l'autorité administrative ou du tribunal administratif",o:["Former un recours auprès de l'autorité administrative ou du tribunal administratif","Accepter la décision sans recours","Contacter directement le Président de la République","Organiser une manifestation devant la préfecture"]},
+  {cat:"Situation",q:"Votre employeur vous demande de travailler le dimanche. Est-ce légal en France ?",c:"Oui, mais dans des conditions encadrées par la loi avec des compensations",o:["Oui, mais dans des conditions encadrées par la loi avec des compensations","Non, le travail le dimanche est totalement interdit","Oui, sans aucune compensation obligatoire","Non, sauf pour les commerces alimentaires"]},
+  {cat:"Situation",q:"Votre enfant de 14 ans veut travailler pendant les vacances scolaires. Est-ce possible ?",c:"Oui, dans des conditions strictes et avec une autorisation parentale",o:["Oui, dans des conditions strictes et avec une autorisation parentale","Non, c'est totalement interdit avant 16 ans","Oui, sans aucune restriction","Non, il faut attendre 18 ans"]},
+  {cat:"Situation",q:"Vous recevez un appel vous demandant vos coordonnées bancaires pour un remboursement. Que faites-vous ?",c:"Vous refusez et signalez l'arnaque aux autorités compétentes",o:["Vous refusez et signalez l'arnaque aux autorités compétentes","Vous donnez vos informations, c'est pour un remboursement","Vous raccrochez et rappelez vous-même votre banque","Vous demandez un délai de réflexion puis rappellez"]},
+  {cat:"Situation",q:"Vous souhaitez contester un PV de stationnement. Que pouvez-vous faire ?",c:"Envoyer une réclamation à l'officier du ministère public dans les délais légaux",o:["Envoyer une réclamation à l'officier du ministère public dans les délais légaux","Ignorer le PV","Payer sans possibilité de contestation","Contacter directement le maire"]},
+  {cat:"Situation",q:"Vous souhaitez voter mais vous avez déménagé. Que devez-vous faire ?",c:"Mettre à jour votre inscription sur les listes électorales de votre nouvelle commune",o:["Mettre à jour votre inscription sur les listes électorales de votre nouvelle commune","Voter dans votre ancienne commune","Ne plus voter","Voter en ligne automatiquement"]},
+  {cat:"Situation",q:"Vous trouvez que votre loyer est trop élevé et abusif. Que pouvez-vous faire ?",c:"Contacter une association de locataires ou saisir la commission de conciliation",o:["Contacter une association de locataires ou saisir la commission de conciliation","Arrêter de payer le loyer","Occuper d'autres logements vacants","Négocier verbalement et ignorer le problème"]},
+  {cat:"Situation",q:"Votre bailleur social veut vous expulser sans raison légale. Que pouvez-vous faire ?",c:"Contester l'expulsion devant le tribunal et demander l'aide d'un avocat",o:["Contester l'expulsion devant le tribunal et demander l'aide d'un avocat","Partir immédiatement","Refuser de partir et ne rien faire","Payer une somme supplémentaire"]},
+  {cat:"Situation",q:"Vous souhaitez divorcer. Quelle est la démarche correcte en France ?",c:"Engager une procédure de divorce auprès du tribunal judiciaire",o:["Engager une procédure de divorce auprès du tribunal judiciaire","Se séparer sans aucune démarche officielle","Déclarer le divorce à la mairie","Écrire une lettre de divorce à votre conjoint"]},
+  {cat:"Situation",q:"Votre voisin laisse une machine à laver cassée sur le trottoir. Que pouvez-vous faire ?",c:"Signaler l'infraction à la mairie ou à la police municipale",o:["Signaler l'infraction à la mairie ou à la police municipale","Rien, c'est normal","La jeter vous-même dans la poubelle","En parler aux autres voisins et ne rien faire"]},
+];
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let questions = [];
+let current = 0;
+let score = 0;
+let answers = {}; // {idx: chosen}
+let timerInterval = null;
+let timeLeft = 40 * 60;
+let elapsedOnEnd = 0;
+const LABELS = ['A','B','C','D'];
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function fmtTime(s) {
+  return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  // Reset animation
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = '';
+}
+
+function startQuiz() {
+  clearInterval(timerInterval);
+  const base = shuffle(BASE).slice(0, 28);
+  const situ = shuffle(SITU).slice(0, 12);
+  questions = shuffle([...base, ...situ]);
+  current = 0; score = 0; answers = {};
+  timeLeft = 40 * 60; elapsedOnEnd = 0;
+  renderQuestion();
+  showScreen('quiz');
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      elapsedOnEnd = 40 * 60;
+      showTimeoutScreen();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const box = document.getElementById('timerBox');
+  const num = document.getElementById('timerNum');
+  num.textContent = fmtTime(timeLeft);
+  box.className = 'timer-box';
+  if (timeLeft < 300) box.classList.add('danger');
+  else if (timeLeft < 600) box.classList.add('warning');
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const pct = (current / questions.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Question ${current+1} / ${questions.length}`;
+  document.getElementById('scoreLabel').textContent = `${score} correcte${score!==1?'s':''}`;
+
+  const catTag = document.getElementById('catTag');
+  catTag.textContent = q.cat === 'Situation' ? '💡 Situation pratique' : q.cat;
+  catTag.className = 'cat-tag' + (q.cat === 'Situation' ? ' situation' : '');
+
+  document.getElementById('questionText').textContent = q.q;
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  const shuffled = shuffle(q.o.map(o => o));
+  shuffled.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="opt-label">${LABELS[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => pick(opt, btn, shuffled);
+    container.appendChild(btn);
+  });
+  updateTimerUI();
+}
+
+function pick(chosen, btn, shuffledOpts) {
+  const q = questions[current];
+  const isCorrect = chosen === q.c;
+  answers[current] = chosen;
+  if (isCorrect) score++;
+
+  // Disable all buttons
+  const btns = document.querySelectorAll('.option');
+  btns.forEach(b => {
+    b.disabled = true;
+    const txt = b.querySelector('span:last-child').textContent;
+    if (txt === q.c) b.classList.add('correct');
+    else if (b === btn && !isCorrect) b.classList.add('wrong');
+    else b.classList.add('faded');
+  });
+
+  // Update correct label icon
+  btns.forEach(b => {
+    const txt = b.querySelector('span:last-child').textContent;
+    const label = b.querySelector('.opt-label');
+    if (txt === q.c) label.textContent = '✓';
+    else if (b === btn && !isCorrect) label.textContent = '✗';
+  });
+
+  document.getElementById('scoreLabel').textContent = `${score} correcte${score!==1?'s':''}`;
+
+  setTimeout(() => {
+    current++;
+    if (current >= questions.length) {
+      clearInterval(timerInterval);
+      elapsedOnEnd = 40 * 60 - timeLeft;
+      showResultScreen();
+    } else {
+      renderQuestion();
+    }
+  }, 1300);
+}
+
+function finishEarly() {
+  if (!confirm('Voulez-vous vraiment terminer le test ?')) return;
+  clearInterval(timerInterval);
+  elapsedOnEnd = 40 * 60 - timeLeft;
+  showResultScreen();
+}
+
+function showTimeoutScreen() {
+  const answered = Object.keys(answers).length;
+  document.getElementById('timeoutStats').innerHTML = `
+    <div class="result-card"><div class="result-card-n" style="color:#C8A96E">${answered}</div><div class="result-card-l">Questions répondues</div></div>
+    <div class="result-card"><div class="result-card-n" style="color:#34D399">${score}</div><div class="result-card-l">Réponses correctes</div></div>
+  `;
+  showScreen('timeout');
+}
+
+function showResultScreen() {
+  const total = questions.length;
+  const pct = Math.round((score / total) * 100);
+  const pass = pct >= 50;
+
+  const circle = document.getElementById('scoreCircle');
+  circle.className = 'score-circle ' + (pass ? 'pass' : 'fail');
+  document.getElementById('scorePct').textContent = pct + '%';
+  document.getElementById('scoreFrac').textContent = `${score}/${total}`;
+
+  const verdict = document.getElementById('resultVerdict');
+  verdict.textContent = pct === 100 ? 'Parfait !' : pct >= 80 ? 'Excellent !' : pct >= 65 ? 'Très bien !' : pct >= 50 ? 'Reçu ✓' : 'À retravailler';
+  verdict.style.color = pass ? '#34D399' : '#F87171';
+
+  document.getElementById('resultSub').textContent =
+    `Temps utilisé : ${fmtTime(elapsedOnEnd)} · ${pass ? 'Seuil de passage atteint (≥50%)' : 'Seuil de passage non atteint (50%)'}`;
+
+  const situCorrect = Object.entries(answers).filter(([i,a]) => questions[i]?.cat==='Situation' && a===questions[i].c).length;
+  const situTotal = questions.filter(q=>q.cat==='Situation').length;
+
+  document.getElementById('resultGrid').innerHTML = `
+    <div class="result-card"><div class="result-card-n" style="color:#34D399">${score}</div><div class="result-card-l">Correctes</div></div>
+    <div class="result-card"><div class="result-card-n" style="color:#F87171">${total-score}</div><div class="result-card-l">Incorrectes</div></div>
+    <div class="result-card"><div class="result-card-n" style="color:#FBBF24">${situCorrect}/${situTotal}</div><div class="result-card-l">Situations</div></div>
+  `;
+
+  // Errors
+  const errorEntries = Object.entries(answers).filter(([i,a]) => questions[i] && a !== questions[i].c);
+  const errSec = document.getElementById('errorsSection');
+  const errList = document.getElementById('errorsList');
+  if (errorEntries.length > 0) {
+    errSec.style.display = 'block';
+    errList.innerHTML = errorEntries.map(([i, chosen]) => {
+      const q = questions[i];
+      return `<div class="error-card">
+        <div class="error-cat">${q.cat}</div>
+        <div class="error-q">${q.q}</div>
+        <div class="error-wrong">✗ ${chosen}</div>
+        <div class="error-correct">✓ ${q.c}</div>
+      </div>`;
+    }).join('');
+  } else {
+    errSec.style.display = 'none';
+  }
+
+  showScreen('result');
+}
+</script>
+</body>
+</html>
